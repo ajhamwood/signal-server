@@ -39,16 +39,14 @@ var Remote = (function () {
         _.ws.send( JSON.stringify({ id: _.call_id, sessionDescription: pc.localDescription }) )
       }
     };
-    pc.onconnectionstatechange = e => console.log(e);
     /*if ("ontrack" in pc) pc.ontrack = e => $("#remote").src = URL.createObjectURL(e.streams[0]);
     else if ("onaddstream" in pc) pc.onaddstream = e => $("#remote").src = URL.createObjectURL(e.stream);*/
     let dc_start = dc => {
       dc.onopen = () => {
         _.ws.close();
-        _.resolveAnswer(this);
+        _.resolveCall(this);
       };
-      dc.onmessage = e => console.log(e.data);
-      dc.onclose = () => undefined;
+      dc.onmessage = () => _.resolveCall(this)
     }
     if (desc) {
       pc.ondatachannel = e => dc_start(_.conn.dc = e.channel || e);
@@ -69,13 +67,13 @@ var Remote = (function () {
     makeCall: function (pass) {
       return createWS.call(this).then(id => {
         _.ws.send(JSON.stringify({type: "register", id, plaintext: pass}));
-        return new Promise(resolve => _.resolveAnswer = resolve)
+        return new Promise(resolve => _.resolveCall = resolve)
       })
     },
     answerCall: function (pass) {
       return createWS.call(this).then(() => {
         _.ws.send(JSON.stringify({type: "passphrase", plaintext: pass}));
-        return new Promise(resolve => _.resolveAnswer = resolve)
+        return new Promise(resolve => _.resolveCall = resolve)
       })
     },
     postMessage: function (val) { _.conn.dc.send(val) },
