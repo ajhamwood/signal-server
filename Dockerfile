@@ -1,5 +1,7 @@
 FROM ruby:alpine
 
+MAINTAINER Aidan Hamwood <ajh@tuta.io>
+
 RUN apk add --no-cache --update --virtual .build-deps build-base \
     && apk add --no-cache --update libstdc++ && \
     echo 'gem: --no-rdoc --no-ri ' >> ~/.gemrc
@@ -11,8 +13,7 @@ RUN gem install bundler && \
     cd /app; bundle install --clean --jobs=4 && gem clean && \
     apk del .build-deps
 
-ENV PORT 3000
-EXPOSE 3000
+EXPOSE 80
 
-COPY . /app
-CMD ["foreman", "start", "-d", "app"]
+ADD . /app/
+CMD ["foreman", "start", "-d", "/app"]

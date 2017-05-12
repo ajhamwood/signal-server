@@ -35,19 +35,18 @@ var Remote = (function () {
     _.conn = { pc, dc: null };
     // pc.addStream(_.localmedia);
     pc.onicecandidate = function (e) {
-      if (e.candidate === null) {
-        _.ws.send( JSON.stringify({ id: _.call_id, sessionDescription: pc.localDescription }) )
-      }
+      e.candidate || _.ws.send( JSON.stringify({ id: _.call_id, sessionDescription: pc.localDescription }) )
     };
+    pc.onconnectionstatechange = e => console.log(e);
     /*if ("ontrack" in pc) pc.ontrack = e => $("#remote").src = URL.createObjectURL(e.streams[0]);
     else if ("onaddstream" in pc) pc.onaddstream = e => $("#remote").src = URL.createObjectURL(e.stream);*/
     let dc_start = dc => {
       dc.onopen = () => {
         _.ws.close();
         _.resolveCall(this);
-      };
-      dc.onmessage = () => _.resolveCall(this)
-    }
+      }
+      dc.onmessage = () => _resolveCall(this)
+    };
     if (desc) {
       pc.ondatachannel = e => dc_start(_.conn.dc = e.channel || e);
       pc.setRemoteDescription(new (unvendor("RTCSessionDescription"))(desc))
@@ -59,9 +58,12 @@ var Remote = (function () {
     }
   }
 
-  let _;
+  let _ = {};
 
-  function Remote(uri) { _ = { wsuri: uri } }
+  function Remote(uri) {
+    _.ws && _.ws.close();
+    _ = { wsuri: uri }
+  }
 
   Remote.prototype = {
     makeCall: function (pass) {
