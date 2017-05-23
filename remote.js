@@ -31,7 +31,6 @@ var Remote = (function () {
       { iceServers: [{ urls: "stun:stun.l.google.com:19302" }]},
       { optional: [{ RtpDataChannels: false }] }
     );
-    if (_.conn) _.conn.pc.close();
     _.conn = { pc, dc: null };
     // pc.addStream(_.localmedia);
     pc.onicecandidate = function (e) {
