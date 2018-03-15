@@ -8,6 +8,8 @@ Super simple to set up. This is what I use in bash:
       -d -p 127.0.0.1:3000:3000 ajhamwood/signal
     sudo docker logs -f signal
 
+with `PORT=3000` in the `.env`.
+
 ### remote.js
 
 Uses a WebSocket connection to carry RTC negotiation.  
